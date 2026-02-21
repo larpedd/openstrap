@@ -1,7 +1,12 @@
 # OpenStrap
 A fork of the "pekora.rip" bootstrapper, edited to be suitable for *any* revivals.
 
+Currently all domain leads to "pekora.zip", you can change them to any domain. 
+As long as the revivals you are trying to port met these criterias:
 
+- the archived clients should be named: "{version}-ProjectXApp{year}.zip"
+- all archived clients should be in the .zip format
+- the enpoint for the client "version" (e.g. https://setup.yourrev.xyz/version) is returning the correct version.
 
 ## Compiling
 If you'd like, you can compile the bootstrapper yourself.
