@@ -6,6 +6,8 @@ pub const URL: &str = "pekora.zip";
 pub const NAME: &str = "Korone";
 pub const LOCALAPPDATA_NAME: &str = "OpenStrap-Korone";
 pub const FIGLET_FONT: &str = include_str!("../assets/standard.flf");
+pub const CLIENTFILENAMEPREFIX: &str = "ProjectXApp";
+// The client filename should be (version)-(CLIENTFILENAMEPREFIX)(year).zip
 
 // Uninstall shorcut only
 pub const AUTHOR: &str = "larped";

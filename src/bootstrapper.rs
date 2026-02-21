@@ -6,7 +6,7 @@ use std::{
 };
 
 use crate::{
-    config::{LOCALAPPDATA_NAME, NAME, POST_INSTALL_URL, SETUP, URI, URL, YEARS},
+    config::*,
     utils,
 };
 use anyhow::Result;
@@ -74,8 +74,7 @@ pub async fn bootstrap() -> Result<()> {
     }
     for year in &YEARS {
         paris::log!("Downloading {year} client...");
-        // PLEASE EDIT THIS before PORTing IT TO YOUR REVIVALS
-        let url = format!("{SETUP}/{latest_version}-ProjectXApp{year}.zip");
+        let url = format!("{SETUP}/{latest_version}-{CLIENTFILENAMEPREFIX}{year}.zip");
         let res = client.get(&url).send().await?;
 
         let total_size = res
@@ -183,7 +182,7 @@ pub async fn bootstrap() -> Result<()> {
         .map_err(|e| anyhow!("Error adding uninstall shortcut: {e}"))?;
     paris::success!("Finished installing {NAME}, have fun playing! ^_^");
 
-    if !is_an_update {
+    if !is_an_update && POST_INSTALL_URL != ""{
         open::that(POST_INSTALL_URL)?;
     }
     Ok(())

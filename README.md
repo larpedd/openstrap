@@ -4,8 +4,8 @@ A fork of the "pekora.rip" bootstrapper, edited to be suitable for *any* revival
 Currently all domain leads to "pekora.zip", you can change them to any domain. 
 As long as the revivals you are trying to port met these criterias:
 
-- the archived clients should be named: "{version}-ProjectXApp{year}.zip"
 - all archived clients should be in the .zip format
+- The client filename should be named "(version)-(CLIENTFILENAMEPREFIX)(year).zip"
 - the enpoint for the client "version" (e.g. https://setup.yourrev.xyz/version) is returning the correct version.
 
 ## Compiling
