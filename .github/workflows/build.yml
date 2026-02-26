@@ -32,16 +32,15 @@ jobs:
       with:
         name: Bootstrapper
         path: ./target/x86_64-pc-windows-gnu/release/*-bootstrapper.exe
-
+        
     - name: Publish release (create or update, overwrite assets)
-          if: startsWith(github.ref, 'refs/tags/')
-          uses: softprops/action-gh-release@v2
-          with:
-            tag_name: ${{ github.ref_name }}
-            name: Release ${{ github.ref_name }}
-            draft: false
-            prerelease: false
-            files: ./target/x86_64-pc-windows-gnu/release/*-bootstrapper.exe
-            overwrite: true
-          env:
-            GITHUB_TOKEN: ${{ secrets.TOKEN }}
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: Release ${{ github.ref_name }}
+        draft: false
+        prerelease: false
+        files: ./target/x86_64-pc-windows-gnu/release/*-bootstrapper.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
