@@ -2,20 +2,35 @@ use std::{
     env,
     io::{self, Write}, 
     path::PathBuf,
-    fs,
-    process::Command,
-    os::windows::process::CommandExt
+    fs
 };
 
+#[cfg(windows)]
+use std::os::windows::process::CommandExt;
+#[cfg(target_os = "linux")]
+use self_replace::self_delete;
+
 use anyhow::Result;
+
 use walkdir::WalkDir;
 use indicatif::{ProgressBar, ProgressStyle};
-use crate::{config::{self, NAME}, utils};
+use crate::{
+    config::*, 
+    utils
+};
 
 
 pub async fn main() -> Result<()> {
-    let local_appdata = env::var("LOCALAPPDATA")?;
-    let install_dir = PathBuf::from(local_appdata).join(config::LOCALAPPDATA_NAME);
+    let install_dir;
+
+    #[cfg(windows)]{
+        let local_appdata = env::var("LOCALAPPDATA")?;
+        install_dir = PathBuf::from(local_appdata).join(LOCALAPPDATA_NAME);
+    }
+    #[cfg(target_os = "linux")]{
+        let home_dir = env::var("HOME")?;
+        install_dir = PathBuf::from(home_dir).join(format!(".local/share/{LOCALAPPDATA_NAME}"));
+    }
     let current_exe = env::current_exe()?;
 
     if install_dir.is_dir(){
@@ -47,7 +62,6 @@ pub async fn main() -> Result<()> {
             for entry in WalkDir::new(&install_dir).contents_first(true) {
                 let entry = entry?;
                 let path = entry.path();
-                //let filename = path.file_name().unwrap().to_str().unwrap();
 
                 if path == current_exe {
                     continue;
@@ -76,11 +90,11 @@ pub async fn main() -> Result<()> {
 
             pb.finish();
 
-            paris::success!("Successfully removing {} clients", config::NAME);
+            paris::success!("Successfully removing {} clients", NAME);
 
             paris::log!("Removing URI...");
 
-            if let Err(e) = utils::remove_uri(config::URI) {
+            if let Err(e) = utils::remove_uri(URI) {
                 paris::warn!("Failed to remove URI {}", e);
             } else {
                 paris::success!("URI removed.");
@@ -94,22 +108,25 @@ pub async fn main() -> Result<()> {
                 paris::success!("Shortcut removed.");
             }
 
-            paris::success!("{} is uninstalled.",config::NAME);
+            #[cfg(target_os = "linux")]
+            self_delete()?;
+
+            paris::success!("{} is uninstalled.",NAME);
             print!("Press Enter to continue...");
             io::stdout().flush().unwrap();
             io::stdin().read_line(&mut String::new()).expect(&String::new());
 
+            #[cfg(windows)]
             let _ = Command::new("cmd")
                 .raw_arg(format!(" /C ping 127.0.0.1 -n 3 > nul & del \"{}\" & rmdir \"{}\"", current_exe.display(), install_dir.display()))
                 .spawn();
-
             return Ok(());
         } else {
             paris::info!("Aborted.");
             return Ok(());
         }
     } else {
-        paris::success!("{} client already uninstalled, no need to worry.",config::NAME)
+        paris::success!("{} client already uninstalled, no need to worry.", NAME)
     }
     Ok(())
 }

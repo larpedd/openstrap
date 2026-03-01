@@ -40,13 +40,13 @@ pub async fn launch(uri: &str) -> Result<()> {
     paris::info!("Starting {}", args.client_version);
     let exe_path = current_exe()?;
     let install_path = exe_path.parent().unwrap();
-    Command::new(
-        install_path
-            .join("Versions")
-            .join(&latest_version)
-            .join(&args.client_version)
-            .join("ProjectXPlayerBeta.exe"),
-    )
+    let client_path = install_path.join("Versions").join(&latest_version).join(&args.client_version).join("ProjectXPlayerBeta.exe");
+    #[cfg(windows)]
+    let command = format!("{client_path:?}");
+    #[cfg(target_os = "linux")]
+    let command = format!("wine {client_path:?}");
+
+    Command::new(command)
     .arg("--play")
     .arg("-a")
     .arg(&format!("https://www.{URL}/Login/Negotiate.ashx"))

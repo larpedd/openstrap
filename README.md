@@ -1,7 +1,7 @@
 # OpenStrap
 A fork of the "pekora.rip" bootstrapper, edited to be suitable for *any* revivals.
 
-Currently all domain leads to "pekora.zip", you can change them to any domain. 
+Currently all domain are pointed to "pekora.zip", you can change them to any domain. 
 As long as the revivals you are trying to port met these criterias:
 
 - all archived clients should be in the .zip format

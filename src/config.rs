@@ -9,5 +9,9 @@ pub const FIGLET_FONT: &str = include_str!("../assets/standard.flf");
 pub const CLIENTFILENAMEPREFIX: &str = "ProjectXApp"; // optional
 // The client filename should be (version)-(CLIENTFILENAMEPREFIX)(year).zip
 
-// Uninstall shorcut only
+// Uninstall shorcut only (windows)
+#[cfg(windows)]
 pub const AUTHOR: &str = "larped";
+
+#[cfg(target_os = "linux")]
+pub const DESKTOP_ENTRY_VERSION: &str = "0.1"; // for linux distros
