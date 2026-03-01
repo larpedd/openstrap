@@ -1,5 +1,4 @@
 use std::{
-    env::current_exe,
     process::Command
 };
 
@@ -38,23 +37,30 @@ pub async fn launch(uri: &str) -> Result<()> {
         place_launcher_url: captures.get(4).unwrap().as_str().to_string(),
     };
     paris::info!("Starting {}", args.client_version);
-    let exe_path = current_exe()?;
-    let install_path = exe_path.parent().unwrap();
+    let install_path = bootstrapper::get_install_dir()?;
     let client_path = install_path.join("Versions").join(&latest_version).join(&args.client_version).join("ProjectXPlayerBeta.exe");
     #[cfg(windows)]
-    let command = format!("{client_path:?}");
+    Command::new(client_path)
+        .arg("--play")
+        .arg("-a")
+        .arg(&format!("https://www.{URL}/Login/Negotiate.ashx"))
+        .arg("-t")
+        .arg(args.game_info)
+        .arg("-j")
+        .arg(args.place_launcher_url)
+        .spawn()?;
     #[cfg(target_os = "linux")]
-    let command = format!("wine {client_path:?}");
-
-    Command::new(command)
-    .arg("--play")
-    .arg("-a")
-    .arg(&format!("https://www.{URL}/Login/Negotiate.ashx"))
-    .arg("-t")
-    .arg(args.game_info)
-    .arg("-j")
-    .arg(args.place_launcher_url)
-    .spawn()?;
+    Command::new("wine")
+        .arg(client_path)
+        .arg("--play")
+        .arg("-a")
+        .arg(&format!("https://www.{URL}/Login/Negotiate.ashx"))
+        .arg("-t")
+        .arg(args.game_info)
+        .arg("-j")
+        .arg(args.place_launcher_url)
+        .spawn()?;
+    
     paris::success!("Started Client");
     Ok(())
 }

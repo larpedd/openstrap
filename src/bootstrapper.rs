@@ -26,7 +26,7 @@ fn build_client() -> Result<Client> {
         .context("Failed to build HTTP client")
 }
 
-fn get_install_dir() -> Result<PathBuf> {
+pub fn get_install_dir() -> Result<PathBuf> {
     #[cfg(windows)]
     {
         let local_appdata = env::var("LOCALAPPDATA").context("LOCALAPPDATA not set")?;

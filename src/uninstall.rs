@@ -1,7 +1,6 @@
 use std::{
     env,
     io::{self, Write}, 
-    path::PathBuf,
     fs
 };
 
@@ -15,23 +14,14 @@ use anyhow::Result;
 use walkdir::WalkDir;
 use indicatif::{ProgressBar, ProgressStyle};
 use crate::{
-    config::*, 
-    utils
+    bootstrapper::*, config::*, utils
 };
 
 
 pub async fn main() -> Result<()> {
-    let install_dir;
-
-    #[cfg(windows)]{
-        let local_appdata = env::var("LOCALAPPDATA")?;
-        install_dir = PathBuf::from(local_appdata).join(LOCALAPPDATA_NAME);
-    }
-    #[cfg(target_os = "linux")]{
-        let home_dir = env::var("HOME")?;
-        install_dir = PathBuf::from(home_dir).join(format!(".local/share/{LOCALAPPDATA_NAME}"));
-    }
+    let install_dir = get_install_dir()?;
     let current_exe = env::current_exe()?;
+    let mut uninstall_from_boostrapper_installer = true; // i.e. running the binary outside the installation folder.
 
     if install_dir.is_dir(){
         let mut option: String = String::new();
@@ -64,6 +54,7 @@ pub async fn main() -> Result<()> {
                 let path = entry.path();
 
                 if path == current_exe {
+                    uninstall_from_boostrapper_installer = false;
                     continue;
                 }
 
@@ -109,7 +100,9 @@ pub async fn main() -> Result<()> {
             }
 
             #[cfg(target_os = "linux")]
-            self_delete()?;
+            if !uninstall_from_boostrapper_installer{
+                self_delete()?;
+            }
 
             paris::success!("{} is uninstalled.",NAME);
             print!("Press Enter to continue...");
@@ -117,9 +110,11 @@ pub async fn main() -> Result<()> {
             io::stdin().read_line(&mut String::new()).expect(&String::new());
 
             #[cfg(windows)]
-            let _ = Command::new("cmd")
-                .raw_arg(format!(" /C ping 127.0.0.1 -n 3 > nul & del \"{}\" & rmdir \"{}\"", current_exe.display(), install_dir.display()))
-                .spawn();
+            if !uninstall_from_boostrapper_installer{
+                let _ = Command::new("cmd")
+                    .raw_arg(format!(" /C ping 127.0.0.1 -n 3 > nul & del \"{}\" & rmdir \"{}\"", current_exe.display(), install_dir.display()))
+                    .spawn();
+            }
             return Ok(());
         } else {
             paris::info!("Aborted.");
