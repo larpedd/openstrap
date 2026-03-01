@@ -38,7 +38,7 @@ Name={NAME}
 Exec={exe_path:?} %u
 Type=Application
 Version={DESKTOP_ENTRY_VERSION}
-Terminal=True
+Terminal=true
 MimeType=x-scheme-handler/{uri_scheme}
 ");
         fs::write(&applications.join(format!("{NAME}.desktop")),entry_content)?;
@@ -82,7 +82,7 @@ pub fn add_uninstall_shortcut(exe_path: &Path) -> Result<(), Box<dyn std::error:
 Name=Uninstal {NAME}
 Exec={exe_path:?} uninstall
 Type=Application
-Terminal=True
+Terminal=true
 Version={DESKTOP_ENTRY_VERSION}
 ");
         fs::write(&applications.join(format!("{NAME}-Uninstall.desktop")),entry_content)?;

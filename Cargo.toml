@@ -1,6 +1,6 @@
 [package]
 name = "korone-bootstrapper" # Change the name
-version = "0.1.0" # Change the version
+version = "0.1.1" # Change the version
 edition = "2024"
 
 [dependencies]

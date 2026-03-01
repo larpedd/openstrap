@@ -16,14 +16,15 @@ use indicatif::{ProgressBar, ProgressStyle};
 use reqwest::Client;
 use zip::ZipArchive;
 
-const MAX_RETRIES: u32 = 3;
+const MAX_RETRIES: u32 = 6;
 const RETRY_DELAY: Duration = Duration::from_secs(2);
-const CONNECT_TIMEOUT: Duration = Duration::from_secs(30);
+const CONNECT_TIMEOUT: Duration = Duration::from_secs(60);
 
 fn build_client() -> Result<Client> {
     Client::builder()
         .connect_timeout(CONNECT_TIMEOUT)
         .tcp_keepalive(Duration::from_secs(10))
+        .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36") // have less chance to get disconnected mid download
         .build()
         .context("Failed to build HTTP client")
 }
