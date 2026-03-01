@@ -1,11 +1,14 @@
 use std::{
     env,
     io::{self, Write}, 
-    fs
+    fs,
 };
 
 #[cfg(windows)]
+use std::process::Command;
+#[cfg(windows)]
 use std::os::windows::process::CommandExt;
+
 #[cfg(target_os = "linux")]
 use self_replace::self_delete;
 

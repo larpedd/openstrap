@@ -1,13 +1,17 @@
 use std::path::Path;
 use anyhow::Result;
 use crate::config::*;
-use std::{env, fs};
-use std::path::PathBuf;
-use std::process::Command;
-use std::os::unix::fs::PermissionsExt;
-
 #[cfg(windows)]
 use windows_registry::{Value, CURRENT_USER};
+
+#[cfg(target_os = "linux")]
+use std::{
+    process::Command,
+    os::unix::fs::PermissionsExt,
+    path::PathBuf,
+    env,
+    fs,
+};
 
 pub fn register_uri(uri_scheme: &str, exe_path: &Path) -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(windows)]{
@@ -61,13 +65,13 @@ MimeType=x-scheme-handler/{uri_scheme}
 pub fn add_uninstall_shortcut(exe_path: &Path) -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(windows)]{
         let classes_root = CURRENT_USER.create(r"Software\Microsoft\Windows\CurrentVersion\Uninstall")?;
-        let app_key = classes_root.create(config::NAME)?;
+        let app_key = classes_root.create(NAME)?;
 
         let version = env!("CARGO_PKG_VERSION");
-        app_key.set_value("DisplayName", &Value::from(config::NAME))?;
-        app_key.set_value("Publisher", &Value::from(config::AUTHOR))?;
+        app_key.set_value("DisplayName", &Value::from(NAME))?;
+        app_key.set_value("Publisher", &Value::from(AUTHOR))?;
         app_key.set_value("Version", &Value::from(version))?;
-        app_key.set_value("URLInfoAbout", &Value::from(format!("https://www.{}/", config::URL).as_str()))?;
+        app_key.set_value("URLInfoAbout", &Value::from(format!("https://www.{}/", URL).as_str()))?;
         app_key.set_value("UninstallString", &Value::from(format!("{} uninstall", exe_path.to_string_lossy().into_owned()).as_str()))?;
     }
     #[cfg(target_os = "linux")]{
@@ -113,7 +117,7 @@ pub fn remove_uri(uri_scheme: &str) -> Result<(), Box<dyn std::error::Error>> {
 pub fn remove_uninstall_shortcut() -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(windows)]{
         let classes_root = CURRENT_USER.create(r"Software\Microsoft\Windows\CurrentVersion\Uninstall")?;
-        let _ = classes_root.remove_tree(config::NAME)?;
+        let _ = classes_root.remove_tree(NAME)?;
     }#[cfg(target_os = "linux")]{
         let home_dir = env::var("HOME")?;
         let applications = PathBuf::from(home_dir).join(format!(".local/share/applications/"));

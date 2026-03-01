@@ -3,9 +3,11 @@ use std::{
     fs::{self, File},
     io::{self, Cursor},
     path::PathBuf,
-    process::Command,
     time::Duration,
 };
+
+#[cfg(target_os = "linux")]
+use std::process::Command;
 
 use crate::{config::*, utils};
 use anyhow::{anyhow, Context, Result};
